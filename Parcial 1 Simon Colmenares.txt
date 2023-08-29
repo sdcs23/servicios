@@ -1,0 +1,61 @@
+Primer parcial - Simon David Colmenares - 2205235
+Problema de Configuración de Autenticación PAM en Servidor Apache
+Inicialmente nos logueamos como super usuario y creamos el directorio de archivos privados.
+mkdir /var/www/html/archivos_privados
+
+Dentro de esta creamos una pagina .html :
+vim /var/www/html/archivos_privados/index.html
+que contenga el mensaje de verificacion del funcionamiento de PAM:
+<html>
+        <body>
+                <div style="width: 100%; font-size: 40px; font-weight: bold; text-align: center;">
+                        Pagina de prueba para autenticar con PAM
+                </div>
+        </body>
+</html>
+a esta le damos permisos de 755:
+chmod 755 /var/www/html/archivos_privados/index.html
+
+y continuamos intalando el modulo de autenticacion de PAM:
+yum install mod_authnz_pam -y
+
+Vamos a la ruta 
+vim /etc/httpd/conf.modules.d/55-authnz_pam.conf
+Y descomentamos la linea que tiene en su interior:
+LoadModule authnz_pam_module modules/mod_authnz_pam.so
+
+Y hacemos un reinicio:
+service httpd restart
+
+Luego de esto vamos a la ruta:
+vim /etc/httpd/conf.d/authnz_pam.conf
+
+En este archivo encontramos algunos ejemplos para la configuracion, abajo de los mismos pegamos las siguientes lineas, que son las que generan que el PAM sea el autenticador para el directorio archivos_privados
+<Directory "/var/www/html/archivos_privados">
+    AuthType Basic
+    AuthName "PAM Authentication"
+    AuthBasicProvider PAM
+    AuthPAMService httpd-auth
+    Require valid-user
+</Directory>
+
+Ahora nos dirigimos a esta ruta:
+vim /etc/pam.d/httpd-auth
+Aqui configuramos los permisos para la lista de usuarios denegados, permitiendo que solo accedan al directorio los usuarios que no esten en la lista, asi mismo especificamos la lista donde estaran los usuarios que no puedan acceder:
+auth       required     pam_listfile.so item=user sense=deny file=/etc/httpd/conf.d/denyusers onerr=succeed
+auth       include      system-auth
+account    include      system-auth
+
+Luego nos dirigimos a:
+vim /etc/httpd/conf.d/denyusers
+Aqui colocamos los usuarios que queremos denegar como:
+root
+juan
+
+Luego le damos permiso de 640 para que sea leida y escrita por el controlador de PAM
+chmod 640 /etc/httpd/conf.d/denyusers
+
+Y reiniciamos el demonio de http para que se efectuen los cambios.
+service httpd restart
+Cabe resaltar que para que todo funcione correctamente debe estar el demonio named encendido asi:
+service named start
