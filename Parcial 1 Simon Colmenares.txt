@@ -83,3 +83,15 @@ service httpd restart
 Cabe resaltar que para que todo funcione correctamente debe estar el demonio named encendido asi:
 
 service named start
+
+
+Tercer punto tunelización NGROk
+Instalamos para todas las maquinas el plugin:
+vagrant plugin install vagrant-share
+
+Luego instalamos el ngrok desde internet, lo ponemos en la carpeta y vamos a la ruta de la misma,
+ya aqui ejecutamos el siguiente comando para verificar que ngrok funciona correctamente:
+ngrok
+
+Y luego de esto ejecutamos el siguiente comando para iniciar la tunelización:
+ngrok http 192.168.50.3:80
