@@ -1,4 +1,5 @@
 Primer parcial - Simon David Colmenares - 2205235
+Segundo punto
 Problema de Configuración de Autenticación PAM en Servidor Apache.
 
 Inicialmente nos logueamos como super usuario y creamos el directorio de archivos privados:
@@ -85,7 +86,9 @@ Cabe resaltar que para que todo funcione correctamente debe estar el demonio nam
 service named start
 
 
-Tercer punto tunelización NGROk
+Tercer punto
+tunelización NGROk
+
 Instalamos para todas las maquinas el plugin:
 vagrant plugin install vagrant-share
 
