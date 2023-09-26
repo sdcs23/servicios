@@ -37,7 +37,7 @@ zone "." IN {
         file "named.ca";
 };
 
-zone "devcompany.com." IN {
+zone "datafusion.com." IN {
         type slave;
         file "slaves/datafusion.com.fwd";
         masters{ 192.168.50.4; };
