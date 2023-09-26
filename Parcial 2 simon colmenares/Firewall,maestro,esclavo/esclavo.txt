@@ -39,13 +39,13 @@ zone "." IN {
 
 zone "devcompany.com." IN {
         type slave;
-        file "slaves/devcompany.com.fwd";
+        file "slaves/datafusion.com.fwd";
         masters{ 192.168.50.4; };
 };
 
 zone "50.168.192.in-addr.arpa" IN {
         type slave;
-        file "slaves/devcompany.com.rev";
+        file "slaves/datafusion.com.rev";
         masters{ 192.168.50.4; };
 };
 
