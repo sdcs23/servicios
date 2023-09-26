@@ -9,8 +9,6 @@ firewall-cmd --list-all-zones
 Configuramos las zonas para redireccionar
 
 Dejamos limpia la interfaz publica.
-firewall-cmd --zone=public --remove-interface=eth0 --permanent 
-firewall-cmd --zone=public --remove-interface=eth1 --permanent
 firewall-cmd --zone=public --remove-interface=eth2 --permanent
 
 Añadimos eth2 a la zona interna y activamos el masquerade
@@ -18,8 +16,6 @@ firewall-cmd --zone=internal --add-interface=eth2 --permanent
 firewall-cmd --zone=internal --add-masquerade --permanent
 
 Limpiamos la zona publica.
-firewall-cmd --zone=public --remove-interface=eth0 --permanent 
-firewall-cmd --zone=public --remove-interface=eth2 --permanent
 firewall-cmd --zone=public --remove-interface=eth1 --permanent
 
 Añadimos eth1 a la zona public y activamos el masquerade
