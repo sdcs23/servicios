@@ -1,0 +1,118 @@
+Simon colmenares 2205235
+
+Configuracion zona fwd
+
+$ORIGIN datafusion.com.
+$TTL 3H
+@       IN      SOA     servidor3.datafusion.com. root@datafusion.com. (
+                        0          ; serial
+                        1D         ; refresh
+                        1H         ; retry
+                        1W         ; expire
+                        3H         ; minimum TTL
+                        )
+@       IN      NS      servidor3.datafusion.com.
+@	IN	NS	servidor2.datafusion.com.
+@	IN	NS	firewall.datafusion.com.
+
+;host en la zona
+
+@       IN      A       192.168.50.4
+@	IN	A	192.168.50.2
+@	IN	A	192.168.50.3
+@	IN	A	172.16.0.3
+servidor3	IN	A	192.168.50.4
+servidor2	IN	A	192.168.50.2
+firewall	IN	A	192.168.50.3
+
+
+Configuracion zona rev
+
+$ORIGIN 50.168.192.in-addr.arpa.
+$TTL 3H
+@       IN      SOA     servidor3.datafusion.com. root@datafusion.com. (
+                        0          ; serial
+                        1D         ; refresh
+                        1H         ; retry
+                        1W         ; expire
+                        3H         ; minimum TTL
+                        )
+@       IN      NS      servidor3.datafusion.com.
+@       IN      NS      servidor2.datafusion.com.
+@       IN      NS      firewall.datafusion.com.
+
+;host en la zona
+
+4	IN	PTR     servidor3.datafusion.com.
+2	IN	PTR     servidor2.datafusion.com.
+3	IN	PTR     firewall.datafusion.com.
+
+
+Permisos para las zonas
+sudo chmod 755 /var/named/datafusion.com.fwd
+sudo chmod 755 /var/named/datafusion.com.rev
+
+configurando el named.conf
+
+vim /etc/named.conf
+options {
+        listen-on port 53 { 127.0.0.1; 192.168.50.4; };
+        listen-on-v6 port 53 { ::1; };
+        directory       "/var/named";
+        dump-file       "/var/named/data/cache_dump.db";
+        statistics-file "/var/named/data/named_stats.txt";
+        memstatistics-file "/var/named/data/named_mem_stats.txt";
+        recursing-file  "/var/named/data/named.recursing";
+        secroots-file   "/var/named/data/named.secroots";
+        allow-query     { localhost; 192.168.50.0/24; };
+
+	recursion yes;
+        dnssec-enable yes;
+        dnssec-validation yes;
+        bindkeys-file "/etc/named.root.key";
+        managed-keys-directory "/var/named/dynamic";
+        geoip-directory "/usr/share/GeoIP";
+
+        pid-file "/run/named/named.pid";
+        session-keyfile "/run/named/session.key";
+};
+
+logging {
+        channel default_debug {
+                file "data/named.run";
+                severity dynamic;
+        };
+};
+
+zone "." IN {
+        type hint;
+        file "named.ca";
+};
+
+zone "datafusion.com." IN {
+        type master;
+        file "datafusion.com.fwd";
+};
+
+zone "50.168.192.in-addr.arpa" IN {
+        type master;
+        file "datafusion.com.rev";
+};
+
+Iniciamos el named:
+
+service named start
+
+Verificamos las zonas:
+
+named-checkzone datafusion.com /var/named/datafusion.com.fwd
+named-checkzone 50.168.192.in-addr.arpa /var/named/datafusion.com.rev
+
+configuramos el resolv:
+
+vim /etc/resolv.conf
+nameserver 192.168.50.4
+
+reiniciamos:
+
+service named restart

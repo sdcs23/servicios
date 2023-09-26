@@ -1,0 +1,46 @@
+Simon colmenares 2205235
+
+Iniciamos firewalld
+service firewalld start
+
+listamos las zonas
+firewall-cmd --list-all-zones
+
+Configuramos las zonas para redireccionar
+
+Dejamos limpia la interfaz publica.
+firewall-cmd --zone=public --remove-interface=eth0 --permanent 
+firewall-cmd --zone=public --remove-interface=eth1 --permanent
+firewall-cmd --zone=public --remove-interface=eth2 --permanent
+
+Añadimos eth2 a la zona interna y activamos el masquerade
+firewall-cmd --zone=internal --add-interface=eth2 --permanent
+firewall-cmd --zone=internal --add-masquerade --permanent
+
+Limpiamos la zona publica.
+firewall-cmd --zone=public --remove-interface=eth0 --permanent 
+firewall-cmd --zone=public --remove-interface=eth2 --permanent
+firewall-cmd --zone=public --remove-interface=eth1 --permanent
+
+Añadimos eth1 a la zona public y activamos el masquerade
+firewall-cmd --zone=public --add-interface=eth1 --permanent
+firewall-cmd --zone=public --add-masquerade --permanent
+
+Ponemos los servicios y puertos necesarios para redireccionar.
+firewall-cmd --zone=public --add-service=dns --permanent
+firewall-cmd --zone=public --add-port=53/tcp --permanent
+firewall-cmd --zone=public --add-port=53/udp --permanent
+
+firewall-cmd --zone=public --add-forward-port=port=53:proto=tcp:toport=53:toaddr=192.168.50.2 --permanent
+firewall-cmd --zone=public --add-forward-port=port=53:proto=udp:toport=53:toaddr=192.168.50.2 --permanent
+
+reiniciamos las configuraciones.
+firewall-cmd --reload
+
+Verificación de las zonas
+firewall-cmd --list-all-zones
+
+Configuracion del resolv.
+vim /etc/resolv.conf
+nameserver 192.168.50.2
+
