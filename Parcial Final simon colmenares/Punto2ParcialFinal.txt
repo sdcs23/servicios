@@ -1,0 +1,79 @@
+Simon David Colmenares - 2205235
+
+-----Segundo punto-----
+
+#Lo primero que haremos será comprobar el funcionamiento del API Rest que se nos suministra en Python Flask.
+#Para eso, lo que haremos será clonar el repositorio desde nuestra máquina anfitrión o usuario local
+
+git clone https://github.com/omondragon/APIRestFlaskMySQLUbuntu
+
+#Después, entraremos al directorio del proyecto clonado 
+
+cd APIRestFlaskMySQLUbuntu/
+
+#Levantamos y aprovisionamos la maquina con el comando 'vagrant up'
+#Iniciamos sesión SSH en el servidor con el comando 'vagrant ssh servidorRest'
+#Ejecutamos el siguiente código para correrlo
+
+export FLASK_APP=apirest_mysql.py
+python3 -m flask run --host=0.0.0.0
+
+#Comprobamos el funcionamiento de la API Rest en Python Flask con 
+#persistencia de datos usando una base de datos MySQL con la herramienta Postman, 
+#haciendo consultas como GET, POST, PUT y DELETE.
+#Para esas consultas, usaremos como dirección url la siguiente
+
+http://192.168.60.3:5000/books
+
+#Con la cual podremos hacer las variaciones del GET por id o en general, el POST y el PUT por id
+#como también el DELETE por el mismo.
+
+-----Segundo punto (B)-----
+
+#Ahora lo que haremos será escribir un código en otro lenguaje de programación (en este caso Nodejs)
+#que funcione como cliente de la aplicación de API REST + MYSQL suministrada y explicada anteriormente. 
+#Este código permite generar peticiones GET, POST, PUT, DELETE y funcionar de manera análoga a herramientas
+#como Postman.
+
+#Lo primero que haremos será instalar Nodejs para Ubuntu, ya que trabajaremos en la misma carpeta
+#del punto anterior. Los comandos para instalar Node y su librería con sus debidos paquetes llamada
+#Node Package Manager(NPM) y luego verificar su versión e instalación de ambas cosas son los siguientes
+
+sudo apt install nodejs
+sudo apt install npm
+node -v (o node -version)
+npm -v or npm –version
+
+#De esta manera ya estaría instalado Node en nuestra máquina. Ahora crearemos una carpeta que se llame 'clienteNode'
+#donde crearemos nuestro archivo con el nombre 'archivo_node.js', en el cuál escribiremos el código que nos cumplirá 
+#con la tarea que se requiere. 
+
+#En el código se trabajó con la librería 'axios' la cuál facilita y permite
+#realizar consultas/peticiones HTTP desde Node.js para la API Rest en la cuál se trabaja cómo servidor y desde donde
+#este 'cliente' se alimenta de ella. Esta librería se utilizó en todas las funciones las cuáles son; realizar una
+#solicitud GET, realizar solicitud GET por ID, realizar una solicitud POST, realizar una solicitud PUT por ID,
+#realizar una solicitud DELETE por ID.
+
+#Después, tenemos todas las funciones de prueba que queramos que haga este cliente cuando se ejecute. Se tienen
+#comentadas para que haya un debido orden y no se generen inconsistencias al ejecutar todas. Por lo que, al momento
+#de abrir el código o ejecutarlo sólo hará la función de listar todos los libros, debido a que las otras están comentadas.
+
+// Ejecutar las funciones de prueba
+getBooks();
+//getBookById(2);
+//createBook({ title: 'Nuevo Libro', description: 'Descripción del libro', author: 'Autor del libro' });
+//updateBook(2, { author: 'Alex' });
+//deleteBook(1);
+
+#Para ejecutar este archivo y comprobar que funcione, primero tenemos que correr el API Rest de Python Flask del punto
+#anterior con los siguientes comandos
+
+export FLASK_APP=apirest_mysql.py
+python3 -m flask run --host=0.0.0.0
+
+#Después de que esté corriendo, ejecutaremos nuestro archivo node con el siguiente comando
+
+node archivo_node.js
+
+#Al ejecutarlo, lo que debería pasar es que se listen todos los libros desde ahí. Para hacer un POST o PUT, debemos #comentar la línea de 'getBooks();' y luego descomentar lo que primero vayamos a hacer, luego usar una herramienta como
+#postman para hacer un GET por ejemplo y verificar que sí se hayan realizado los cambios, por lo que eso sería todo, la manera de hacerlo y comprobar que este cliente con Node funcione de manera análoga al postman.

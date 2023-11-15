@@ -1,0 +1,23 @@
+Simon David Colmenares - 2205235
+
+-----Punto adicional-----
+
+Instalamos grafana desde https://grafana.com/grafana/download?platform=linux con el siguiente comando:
+
+wget https://dl.grafana.com/enterprise/release/grafana-enterprise-10.2.0.linux-amd64.tar.gz
+
+y lo extraemos y entramos a la carpeta:
+
+tar -zxvf grafana-enterprise-10.2.0.linux-amd64.tar.g
+cd grafana-10.2.0
+
+Luego corremos el grafana asi:
+
+./bin/grafana-server
+
+Nos dirigimos a ip_servidor:3000 para visualizar el login de grafana
+
+Entramos con admin en ambos campos y agragamos un data source, escogemos prometeus y le personalizamos el nombre 
+y la ip donde esta corriendo prometheus, guardamos y pasamos a la pestaña dashboard, en esta creamos un nuevo 
+dashboard e importamos uno, el 1860, lo cargamos y seleccionamos el provider de prometheus que antes creamos
+y listo ya tenemos la interfaz.

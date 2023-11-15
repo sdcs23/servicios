@@ -1,0 +1,107 @@
+Simon David Colmenares - 2205235
+
+-----Primer punto-----
+
+1. Inicialmente instalamos con yum el apt para actualizar los paquetes del sistema:
+
+yum install apt
+
+Para luego ejecutar el comando sudo apt update.
+
+Luego se creo un usuario y un grupo para utilizar con prometheus:
+
+sudo groupadd --system prometheus
+sudo useradd -s /sbin/nologin --system -g prometheus prometheus
+
+Luego de esto creamos los directorios necesarios con:
+
+sudo mkdir /etc/prometheus
+sudo mkdir /var/lib/prometheus
+
+Ahora si procedimos con la instalacion:
+
+wget https://github.com/prometheus/prometheus/releases/download/v2.43.0/prometheus-2.43.0.linux-amd64.tar.gz
+tar vxf prometheus*.tar.gz
+
+Luego nos dirigimos a la carpeta para poder configurar el prometheus:
+
+cd prometheus*/
+
+En la configuracion se movieron algunos archivos a otras rutas y se le dio permisos para el ususario y el grupo prometheus:
+
+sudo mv prometheus /usr/local/bin
+sudo mv promtool /usr/local/bin
+sudo chown prometheus:prometheus /usr/local/bin/prometheus
+sudo chown prometheus:prometheus /usr/local/bin/promtool
+
+de igual forma se agregaron mas archivos y se le dio permisos:
+
+sudo mv consoles /etc/prometheus
+sudo mv console_libraries /etc/prometheus
+sudo mv prometheus.yml /etc/prometheus
+sudo chown prometheus:prometheus /etc/prometheus
+sudo chown -R prometheus:prometheus /etc/prometheus/consoles
+sudo chown -R prometheus:prometheus /etc/prometheus/console_libraries
+sudo chown -R prometheus:prometheus /var/lib/prometheus
+
+Luego para verificar la configuracion se verifico el archivo en la ruta /etc/prometheus/prometheus.yml
+
+Luego creamos el servicio para correr prometheus, en la ruta sudo nano /etc/systemd/system/prometheus.service y dentro de este archivo agregamos las siguientes lineas:
+[Unit]
+Description=Prometheus
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+ExecStart=/usr/local/bin/prometheus \
+    --config.file /etc/prometheus/prometheus.yml \
+    --storage.tsdb.path /var/lib/prometheus/ \
+    --web.console.templates=/etc/prometheus/consoles \
+    --web.console.libraries=/etc/prometheus/console_libraries
+
+[Install]
+WantedBy=multi-user.target
+
+Luego de esto reiniciamos todos los servicios que posee el sistema.
+
+sudo systemctl daemon-reload
+
+y habilitamos, corremos y verificamos el estado del prometheus:
+
+sudo systemctl enable prometheus
+sudo systemctl start prometheus
+sudo systemctl status prometheus
+
+Y por ultimo en la configuracion del prometheus habilitamos el puerto 9090:
+
+sudo ufw allow 9090/tcp
+
+y verificamos el funcionamiento por la ip que tenga definida nuestro dispositivo y el puerto de prometheus.
+
+2.Para el node exporter nos dirigimos al sitio de las desacargas: https://prometheus.io/download/#node_exporter
+
+Aqui descargamos la ultima version y lo extraemos:
+
+wget https://github.com/prometheus/node_exporter/releases/download/v1.6.1/node_exporter-1.6.1.linux-amd64.tar.gz
+tar xvfz node_exporter-*.*-amd64.tar.gz
+
+nos dirigimos a la carpeta y corremos el servicio:
+
+cd node_exporter-*.*-amd64
+./node_exporter
+
+Para verificar que todo este funcionando y que las metricas se esten registrando corremos el comando:
+
+curl http://ip_servidor:9100/metrics
+
+Para configurar las estancias del prometheus dentro del archivo prometheus.yml, luego en este archivo agregamos las siguientes lineas:
+
+- job_name: node
+  static_configs:
+  - targets: ['localhost:9100']
+
+reiniciamos el servicio y verificamos el estado, luego abrimos el prometheus y verificamos que las metricas de node ya esten implementadas.
+Adicionalmente se puede verificar en las instancas desde la interfaz de prometheus y debe aparecer como adicional la isntancia del node exporter.
